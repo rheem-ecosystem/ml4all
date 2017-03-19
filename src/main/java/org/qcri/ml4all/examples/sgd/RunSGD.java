@@ -21,10 +21,9 @@ public class RunSGD {
     static int features = 123;
 
     //these are for SGD/mini run to convergence
-    static int sampleSize = 0;
     static double accuracy = 0.00;
-    static int max_iterations = 10;
-    static Platforms platform = JAVA;
+    static int max_iterations = 50;
+    static Platforms platform = SPARK_JAVA;
 
 
     public static void main (String... args) throws MalformedURLException {
@@ -38,8 +37,7 @@ public class RunSGD {
             features = Integer.parseInt(args[2]);
             max_iterations = Integer.parseInt(args[3]);
             accuracy = Double.parseDouble(args[4]);
-            sampleSize = Integer.parseInt(args[5]);
-            String platformIn = args[6];
+            String platformIn = args[5];
             switch (platformIn) {
                 case "spark":
                     platform = SPARK;
