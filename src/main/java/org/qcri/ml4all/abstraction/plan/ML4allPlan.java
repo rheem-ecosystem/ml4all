@@ -195,8 +195,8 @@ public class ML4allPlan {
                                         list.add((Tuple2) t);
                                         return list;
                                     })
-                                .withTargetPlatform(Spark.platform())
-                                    .reduce(new ReduceWrapper<>()).withName("global reduce");
+                                    .reduce(new ReduceWrapper<>()).withName("global reduce")
+                                    .withTargetPlatform(Spark.platform());
                             newContext = listDataset
                                     .map(new AssignWrapper(updateOp)).withName("assign")
                                     .withBroadcast(ctx, "context")
@@ -221,7 +221,7 @@ public class ML4allPlan {
                     contextBuilder.doWhile((PredicateDescriptor.SerializablePredicate<Collection<Double>>) collection ->
                             new LoopCheckWrapper<>(loopOp).apply(collection.iterator().next()), ctx -> {
 
-                        DataQuantaBuilder convergenceDataset; //TODO: don't restrict the convergence value to be double
+                        DataQuantaBuilder convergenceDataset;
                         DataQuantaBuilder<?, ML4allContext> newContext;
 
                         DataQuantaBuilder sampledData;
