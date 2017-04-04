@@ -21,8 +21,8 @@ public class RunSGD {
     static int features = 123;
 
     //these are for SGD/mini run to convergence
-    static double accuracy = 0.00;
-    static int max_iterations = 50;
+    static double accuracy = 0.1;
+    static int max_iterations = 10;
     static Platforms platform = SPARK_JAVA;
 
 
