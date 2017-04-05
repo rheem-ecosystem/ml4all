@@ -153,9 +153,8 @@ public class ML4allPlan {
 
         if (platform.equals(Platforms.SPARK_JAVA)) {
             final DataQuantaBuilder transformBuilder = javaPlanBuilder
-                    .readTextFile(inputFileUrl).withName("source")
-                    .mapPartitions(new TransformPerPartitionWrapper(transformOp)).withName("transform")
-                    .withTargetPlatform(Spark.platform());
+                    .readTextFile(inputFileUrl).withName("source").withTargetPlatform(Spark.platform())
+                    .mapPartitions(new TransformPerPartitionWrapper(transformOp)).withName("transform").withTargetPlatform(Spark.platform());
 
             Collection<ML4allContext> results =
                     contextBuilder.doWhile((PredicateDescriptor.SerializablePredicate<Collection<Double>>) collection ->
