@@ -28,7 +28,7 @@ public class RunSGD {
 
     public static void main (String... args) throws MalformedURLException {
 
-        String propertiesFile = new File("rheem.properties").getAbsoluteFile().toURI().toURL().toString();
+        String propertiesFile = new File("src/main/resources/rheem.properties").getAbsoluteFile().toURI().toURL().toString();
 
         //Usage: <data_file> <#features> <sparse> <binary>
         if (args.length > 0) {
