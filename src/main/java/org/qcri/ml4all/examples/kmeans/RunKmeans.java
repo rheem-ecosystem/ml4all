@@ -8,6 +8,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 
+import static org.qcri.ml4all.abstraction.plan.Platforms.JAVA;
+import static org.qcri.ml4all.abstraction.plan.Platforms.SPARK;
 import static org.qcri.ml4all.abstraction.plan.Platforms.SPARK_JAVA;
 
 /**
@@ -22,11 +24,11 @@ public class RunKmeans {
 //        int dimension = 3;
         String relativePath = "src/main/resources/input/USCensus1990-sample.txt";
         String file = new File(relativePath).getAbsoluteFile().toURI().toURL().toString();
-        String propertiesFile = new File("rheem.properties").getAbsoluteFile().toURI().toURL().toString();
+        String propertiesFile = new File("src/main/resources/rheem.properties").getAbsoluteFile().toURI().toURL().toString();
         int dimension = 68;
         double accuracy = 0;
         int maxIterations = 10;
-        Platforms platform = SPARK_JAVA;
+        Platforms platform = JAVA;
 
         //Usage:  <data_file> <#points> <#dimension> <#centroids> <accuracy>
         if (args.length > 0) {
