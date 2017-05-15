@@ -11,6 +11,8 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <rheem.version>0.2.2-SNAPSHOT</rheem.version>
+        <nd4j.backend>nd4j-native-platform</nd4j.backend>
+        <nd4j.version>0.8.0</nd4j.version>
     </properties>
 
     <dependencies>
@@ -48,6 +50,11 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nd4j</groupId>
+            <artifactId>${nd4j.backend}</artifactId>
+            <version>${nd4j.version}</version>
         </dependency>
     </dependencies>
 </project>
