@@ -10,7 +10,7 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <rheem.version>0.2.2-SNAPSHOT</rheem.version>
+        <rheem.version>0.2.1</rheem.version>
     </properties>
 
     <dependencies>
@@ -38,6 +38,11 @@
             <groupId>org.qcri.rheem</groupId>
             <artifactId>rheem-spark</artifactId>
             <version>${rheem.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_2.11</artifactId>
+            <version>1.6.3</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>

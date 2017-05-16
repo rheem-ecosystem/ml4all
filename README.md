@@ -6,6 +6,5 @@ It uses a new abstraction that is capable of solving most ML tasks and provides 
 Our preliminary results show that ML4all is more than two orders of magnitude faster than state-of-the-art systems and can process large datasets that were not possible before.
 
 Currently running on:
-- Rheem 0.2.2-SNAPSHOT
-- Spark 1.6.1
-- Hadoop 2.6.2
+- Rheem 0.2.1
+- Spark 1.6.x
