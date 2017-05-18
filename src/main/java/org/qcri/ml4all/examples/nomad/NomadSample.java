@@ -13,6 +13,7 @@ public class NomadSample extends Sample {
 
     @Override
     public SampleOperator.Methods sampleMethod() {
-        return SampleOperator.Methods.ANY;
+
+        return SampleOperator.Methods.RANDOM;
     }
 }

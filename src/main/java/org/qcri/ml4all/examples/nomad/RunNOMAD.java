@@ -16,13 +16,18 @@ import static org.qcri.ml4all.abstraction.plan.Platforms.*;
 public class RunNOMAD {
 
     // Default parameters.
-
-    static String relativePath = "src/main/resources/input/USC-SIMPLE.txt";
-    static int datasetSize  = 100827;
-    static int features = 123;
+///Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/USCensus1990-NOMAD.txt
+    static String relativePath = "src/main/resources/input/USCensus1990-NOMAD.txt";
+    static String filePath = "/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/USC-SIMPLE.txt";
+    static int datasetSize  = 7;
+    static int features = 69;
+    static int k = 5;
 
     static int max_iterations = 10;
     static Platforms platform = SPARK_JAVA;
+
+    static double regulizer = 1.0;
+    static double stepSize = 1.0;
 
 
     public static void main (String... args) throws MalformedURLException {
@@ -40,14 +45,12 @@ public class RunNOMAD {
 
         ML4allPlan plan = new ML4allPlan();
         plan.setDatasetsize(datasetSize);
-        int nColumns= 69;
-        int nRows = 12;
         char delimiter = ',';
         //logical operators of template
-        plan.setTransformOp(new NomadTransform(features,delimiter ));
-        plan.setLocalStage(new NomadStageWithRandomValues(features, nColumns, nRows));
+        plan.setTransformOp(new NomadTransform(delimiter ));
+        plan.setLocalStage(new NomadStageWithRandomValues(k, datasetSize, features, filePath));
         plan.setSampleOp(new NomadSample());
-        plan.setComputeOp(new NomadCompute());
+        plan.setComputeOp(new NomadCompute(stepSize, regulizer));
         plan.setUpdateLocalOp(new NomadUpdate());
         plan.setLoopOp(new NomadLoop(max_iterations));
 
