@@ -17,8 +17,8 @@ public class NomadUpdate extends UpdateLocal<Tuple2<INDArray, INDArray>, Tuple2<
         int i = (int)context.getByKey("i");
         int j = (int)context.getByKey("j");
 
-        w.putRow(i, (INDArray) context.getByKey("w"));
-        h.putColumn(j, (INDArray) context.getByKey("h"));
+        w.putRow(i, input.getField0());
+        h.putColumn(j, input.getField1());
 
         return new Tuple2<>(w, h);
     }

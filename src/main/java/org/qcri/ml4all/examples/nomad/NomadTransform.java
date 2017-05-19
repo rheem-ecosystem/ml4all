@@ -10,9 +10,13 @@ import java.util.List;
 public class NomadTransform extends Transform<INDArray, String> {
 
     char separator = ',';
+    static int rowIndex = 0;
+    static INDArray nd ;
 
-    public NomadTransform(char separator) {
+    public NomadTransform(char separator, int m, int n) {
+
         this.separator = separator;
+        this.nd = Nd4j.zeros(m,n);
     }
 
     @Override
@@ -20,11 +24,15 @@ public class NomadTransform extends Transform<INDArray, String> {
 
         List<String> pointStr = StringUtil.split(input, separator);
         double[] point = new double[pointStr.size()];
+
         for(int i=0; i < pointStr.size(); i++){
             point[i] = Double.parseDouble(pointStr.get(i));
         }
 
-        INDArray nd = Nd4j.create(point, new int[]{1, pointStr.size()});
+        INDArray ndTemp = Nd4j.create(point, new int[]{1, pointStr.size()});
+        nd.putRow(rowIndex, ndTemp);
+
+        rowIndex++;
 
         return nd;
     }

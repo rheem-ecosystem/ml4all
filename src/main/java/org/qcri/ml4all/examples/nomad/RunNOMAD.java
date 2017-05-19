@@ -16,14 +16,14 @@ import static org.qcri.ml4all.abstraction.plan.Platforms.*;
 public class RunNOMAD {
 
     // Default parameters.
-///Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/USCensus1990-NOMAD.txt
-    static String relativePath = "src/main/resources/input/USCensus1990-NOMAD.txt";
+
+    static String relativePath = "src/main/resources/input/USC-SIMPLE.txt";
     static String filePath = "/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/USC-SIMPLE.txt";
     static int datasetSize  = 7;
     static int features = 69;
     static int k = 5;
 
-    static int max_iterations = 10;
+    static int max_iterations = 7;
     static Platforms platform = SPARK_JAVA;
 
     static double regulizer = 1.0;
@@ -46,8 +46,7 @@ public class RunNOMAD {
         ML4allPlan plan = new ML4allPlan();
         plan.setDatasetsize(datasetSize);
         char delimiter = ',';
-        //logical operators of template
-        plan.setTransformOp(new NomadTransform(delimiter ));
+        plan.setTransformOp(new NomadTransform(delimiter, datasetSize, features ));
         plan.setLocalStage(new NomadStageWithRandomValues(k, datasetSize, features, filePath));
         plan.setSampleOp(new NomadSample());
         plan.setComputeOp(new NomadCompute(stepSize, regulizer));
@@ -61,7 +60,6 @@ public class RunNOMAD {
     }
 
     private static void setClassVariables(String... args){
-        //Usage: <data_file> <#features> <sparse> <binary>
         if (args.length > 0) {
             relativePath = args[0];
             datasetSize = Integer.parseInt(args[1]);

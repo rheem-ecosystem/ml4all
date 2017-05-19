@@ -7,7 +7,7 @@ import org.qcri.rheem.basic.data.Tuple2;
 
 import java.util.Random;
 
-public class NomadLoop extends Loop<Tuple2<Tuple2<Integer, Integer>, Double>, INDArray> {
+public class NomadLoop extends Loop<Tuple2<INDArray, INDArray>, Tuple2<INDArray, INDArray>> {
 
     public int maxIterations;
     int currentIteration;
@@ -17,22 +17,13 @@ public class NomadLoop extends Loop<Tuple2<Tuple2<Integer, Integer>, Double>, IN
     }
 
     @Override
-    public Tuple2 prepareConvergenceDataset(INDArray input, ML4allContext context) {
+    public Tuple2 prepareConvergenceDataset(Tuple2 input, ML4allContext context) {
         int iteration = (int) context.getByKey("iter");
-        INDArray a = (INDArray)context.getByKey("a");
-        a.putColumn(0, input);
-        context.put("a", a);
-        Random rand = new Random();
-        int i = rand.nextInt((int) context.getByKey("m"));
-        int j = rand.nextInt((int) context.getByKey("n"));
-        double datapoint = a.getDouble(i,j);
-        //Tuple2uple2(new Tuple2(i,j), datapoint)
-
-        return new Tuple2(new Tuple2(i,j), datapoint);
+        return new Tuple2(input.getField0(), input.getField1());
     }
 
     @Override
-    public boolean terminate(Tuple2<Tuple2<Integer, Integer>, Double> input) {
+    public boolean terminate(Tuple2 input) {
         return ++currentIteration >= maxIterations;
     }
 

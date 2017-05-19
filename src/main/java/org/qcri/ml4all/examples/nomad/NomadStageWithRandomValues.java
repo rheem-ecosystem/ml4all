@@ -33,7 +33,7 @@ public class NomadStageWithRandomValues extends LocalStage {
         this.fileName = fileName;
         this.max = Math.sqrt(k);
         this.wShape = new int[]{m, k};
-        this.hShape = new int[]{n, k};
+        this.hShape = new int[]{k, n};
         this.m = m;
         this.n = n;
     }
@@ -43,42 +43,13 @@ public class NomadStageWithRandomValues extends LocalStage {
 
         INDArray w = Nd4j.rand(wShape, min, max, Nd4j.getRandom());
         INDArray h = Nd4j.rand(hShape, min, max, Nd4j.getRandom());
-        INDArray data = Nd4j.zeros(m,n);
 
         context.put("w", w);
         context.put("h", h);
-        context.put("a", data);
-       // context.put("a", this.convertDataToMatrix());
+        context.put("m", m);
+        context.put("n", n);
         context.put("iter", 1);
 
-    }
-
-    private INDArray convertDataToMatrix(){
-
-        List<String> list = new ArrayList<>();
-        INDArray myArray = null;
-
-        try (Stream<String> stream = Files.lines(Paths.get(this.fileName))) {
-            list = stream.collect(Collectors.toList());
-            int nRow = list.size();
-            int nCol = list.get(0).split(",").length;
-            myArray = Nd4j.zeros(nRow, nCol);
-
-            for(int i =0; i < list.size(); i++){
-                List<String> pointStr = StringUtil.split(list.get(i),',');
-                double[] point = new double[pointStr.size()];
-                for(int j=0; j < pointStr.size(); j++){
-                    point[j] = Double.parseDouble(pointStr.get(j));
-                    myArray.putScalar(i, j, point[j]);
-                }
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        return myArray;
     }
 
 }

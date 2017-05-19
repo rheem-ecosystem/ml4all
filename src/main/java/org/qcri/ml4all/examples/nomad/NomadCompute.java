@@ -5,7 +5,9 @@ import org.qcri.ml4all.abstraction.api.Compute;
 import org.qcri.ml4all.abstraction.plan.context.ML4allContext;
 import org.qcri.rheem.basic.data.Tuple2;
 
-public class NomadCompute extends Compute<Tuple2, Tuple2<Tuple2<Integer, Integer>, Double>> {
+import java.util.Random;
+
+public class NomadCompute extends Compute<Tuple2, INDArray> {
 
     double stepSize = 1.0;
     double regulizer = 1.0;
@@ -16,28 +18,30 @@ public class NomadCompute extends Compute<Tuple2, Tuple2<Tuple2<Integer, Integer
     }
 
     @Override
-    public Tuple2 process(Tuple2<Tuple2<Integer, Integer>, Double> input, ML4allContext context) {
+    public Tuple2 process(INDArray input , ML4allContext context) {
 
         INDArray w = (INDArray) context.getByKey("w");
         INDArray h = (INDArray) context.getByKey("h");
 
-        double aDataPoint = input.getField1();
-        int i = input.getField0().field0;
-        int j = input.getField0().field1;
+        Random rand = new Random();
+        int i = rand.nextInt((int) context.getByKey("m"));
+        int j = rand.nextInt((int) context.getByKey("n"));
+        double aDataPoint = input.getDouble(i,j);
 
+        double aW = aDataPoint - (w.getRow(i).mmul(h.getColumn(j)).getDouble(0));
+        INDArray updateW =h.getColumn(j).mul(aW).transpose();
+        updateW = updateW.add(w.getRow(i).mul(regulizer));
+        updateW = updateW.mul(stepSize);
+        updateW = w.getRow(i).sub(updateW);
 
-        double aW = aDataPoint - w.getRow(i).mmul(h.getColumn(j)).getDouble(0);
-        INDArray updateW =h.getRow(j).muli(aW);
-        updateW = updateW.add(w.getColumn(i).muli(regulizer));
-        updateW = updateW.muli(stepSize);
-        updateW = w.getColumn(i).subi(updateW);
+        double aH = aDataPoint - (w.getRow(i).mmul(h.getColumn(j)).getDouble(0)) ;
+        INDArray updateH =w.getRow(i).mul(aW).transpose();
+        updateH = updateH.add(h.getColumn(j).mul(regulizer));
+        updateH = updateH.mul(stepSize);
+        updateH = h.getColumn(j).sub(updateH);
 
-        double aH = aDataPoint - w.getRow(i).mmul(h.getColumn(j)).getDouble(0) ;
-        INDArray updateH =w.getColumn(j).muli(aW);
-        updateH = updateH.add(h.getRow(j).muli(regulizer));
-        updateH = updateH.muli(stepSize);
-        updateH = h.getRow(j).subi(updateH);
-
+        context.put("i",i);
+        context.put("j",j);
 
         return new Tuple2(updateW, updateH);
     }
