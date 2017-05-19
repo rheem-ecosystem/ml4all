@@ -18,7 +18,6 @@ public class NomadLoop extends Loop<Tuple2<INDArray, INDArray>, Tuple2<INDArray,
 
     @Override
     public Tuple2 prepareConvergenceDataset(Tuple2 input, ML4allContext context) {
-        int iteration = (int) context.getByKey("iter");
         return new Tuple2(input.getField0(), input.getField1());
     }
 

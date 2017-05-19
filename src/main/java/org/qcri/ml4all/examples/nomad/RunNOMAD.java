@@ -18,7 +18,6 @@ public class RunNOMAD {
     // Default parameters.
 
     static String relativePath = "src/main/resources/input/USC-SIMPLE.txt";
-    static String filePath = "/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/USC-SIMPLE.txt";
     static int datasetSize  = 7;
     static int features = 69;
     static int k = 5;
@@ -47,7 +46,7 @@ public class RunNOMAD {
         plan.setDatasetsize(datasetSize);
         char delimiter = ',';
         plan.setTransformOp(new NomadTransform(delimiter, datasetSize, features ));
-        plan.setLocalStage(new NomadStageWithRandomValues(k, datasetSize, features, filePath));
+        plan.setLocalStage(new NomadStageWithRandomValues(k, datasetSize, features));
         plan.setSampleOp(new NomadSample());
         plan.setComputeOp(new NomadCompute(stepSize, regulizer));
         plan.setUpdateLocalOp(new NomadUpdate());
@@ -65,7 +64,9 @@ public class RunNOMAD {
             datasetSize = Integer.parseInt(args[1]);
             features = Integer.parseInt(args[2]);
             max_iterations = Integer.parseInt(args[3]);
-            String platformIn = args[4];
+            regulizer = Double.parseDouble(args[4]);
+            stepSize = Double.parseDouble(args[5]);
+            String platformIn = args[6];
             switch (platformIn) {
                 case "spark":
                     platform = SPARK;
