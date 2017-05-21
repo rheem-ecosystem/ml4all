@@ -11,10 +11,11 @@ public class NomadCompute extends Compute<Tuple2, INDArray> {
 
     double stepSize = 1.0;
     double regulizer = 1.0;
-
+    Random rand;
     public NomadCompute(double stepSize, double regulizer) {
         this.stepSize = stepSize;
         this.regulizer = regulizer;
+        this.rand = new Random();
     }
 
     @Override
@@ -23,7 +24,7 @@ public class NomadCompute extends Compute<Tuple2, INDArray> {
         INDArray w = (INDArray) context.getByKey("w");
         INDArray h = (INDArray) context.getByKey("h");
 
-        Random rand = new Random();
+
         int i = rand.nextInt((int) context.getByKey("m"));
         int j = rand.nextInt((int) context.getByKey("n"));
         double aDataPoint = input.getDouble(i,j);
