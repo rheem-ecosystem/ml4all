@@ -1,4 +1,4 @@
-package org.qcri.ml4all.examples.nomad;
+package org.qcri.ml4all.examples.nmf;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
@@ -7,13 +7,13 @@ import org.qcri.ml4all.examples.util.StringUtil;
 
 import java.util.List;
 
-public class NomadTransform extends Transform<INDArray, String> {
+public class NMFTransform extends Transform<INDArray, String> {
 
     char separator = ',';
     static int rowIndex = 0;
     static INDArray nd ;
 
-    public NomadTransform(char separator, int m, int n) {
+    public NMFTransform(char separator, int m, int n) {
 
         this.separator = separator;
         this.nd = Nd4j.zeros(m,n);

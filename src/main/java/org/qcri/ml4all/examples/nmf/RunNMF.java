@@ -1,4 +1,4 @@
-package org.qcri.ml4all.examples.nomad;
+package org.qcri.ml4all.examples.nmf;
 
 import org.qcri.ml4all.abstraction.plan.ML4allPlan;
 import org.qcri.ml4all.abstraction.plan.Platforms;
@@ -13,7 +13,7 @@ import static org.qcri.ml4all.abstraction.plan.Platforms.*;
 /**
  * Execute SGD for logistic regression.
  */
-public class RunNOMAD {
+public class RunNMF {
 
     // Default parameters.
 
@@ -38,19 +38,18 @@ public class RunNOMAD {
         String file = new File(relativePath).getAbsoluteFile().toURI().toURL().toString();
 
         System.out.println("max #maxIterations:" + max_iterations);
-       // System.out.println("accuracy:" + accuracy);
 
         long start_time = System.currentTimeMillis();
 
         ML4allPlan plan = new ML4allPlan();
         plan.setDatasetsize(datasetSize);
         char delimiter = ',';
-        plan.setTransformOp(new NomadTransform(delimiter, datasetSize, features ));
-        plan.setLocalStage(new NomadStageWithRandomValues(k, datasetSize, features));
-        plan.setSampleOp(new NomadSample());
-        plan.setComputeOp(new NomadCompute(stepSize, regulizer));
-        plan.setUpdateLocalOp(new NomadUpdate());
-        plan.setLoopOp(new NomadLoop(max_iterations));
+        plan.setTransformOp(new NMFTransform(delimiter, datasetSize, features ));
+        plan.setLocalStage(new NMFStageWithRandomValues(k, datasetSize, features));
+        plan.setSampleOp(new NMFSample());
+        plan.setComputeOp(new NMFCompute(stepSize, regulizer, datasetSize, features));
+        plan.setUpdateLocalOp(new NMFUpdate());
+        plan.setLoopOp(new NMFLoop(max_iterations));
 
         ML4allContext context = plan.execute(file, platform, propertiesFile);
         System.out.println("Training finished in " + (System.currentTimeMillis() - start_time));

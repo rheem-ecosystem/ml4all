@@ -1,9 +1,9 @@
-package org.qcri.ml4all.examples.nomad;
+package org.qcri.ml4all.examples.nmf;
 
 import org.qcri.ml4all.abstraction.api.Sample;
 import org.qcri.rheem.basic.operators.SampleOperator;
 
-public class NomadSample extends Sample {
+public class NMFSample extends Sample {
 
 
     @Override

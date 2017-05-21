@@ -1,18 +1,16 @@
-package org.qcri.ml4all.examples.nomad;
+package org.qcri.ml4all.examples.nmf;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.qcri.ml4all.abstraction.api.Loop;
 import org.qcri.ml4all.abstraction.plan.context.ML4allContext;
 import org.qcri.rheem.basic.data.Tuple2;
 
-import java.util.Random;
-
-public class NomadLoop extends Loop<Tuple2<INDArray, INDArray>, Tuple2<INDArray, INDArray>> {
+public class NMFLoop extends Loop<Tuple2<INDArray, INDArray>, Tuple2<INDArray, INDArray>> {
 
     public int maxIterations;
     int currentIteration;
 
-    public NomadLoop(int maxIterations) {
+    public NMFLoop(int maxIterations) {
         this.maxIterations = maxIterations;
     }
 

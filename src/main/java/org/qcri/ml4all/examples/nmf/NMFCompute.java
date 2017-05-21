@@ -1,4 +1,4 @@
-package org.qcri.ml4all.examples.nomad;
+package org.qcri.ml4all.examples.nmf;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.qcri.ml4all.abstraction.api.Compute;
@@ -7,14 +7,18 @@ import org.qcri.rheem.basic.data.Tuple2;
 
 import java.util.Random;
 
-public class NomadCompute extends Compute<Tuple2, INDArray> {
+public class NMFCompute extends Compute<Tuple2, INDArray> {
 
     double stepSize = 1.0;
     double regulizer = 1.0;
+    int m;
+    int n;
     Random rand;
-    public NomadCompute(double stepSize, double regulizer) {
+    public NMFCompute(double stepSize, double regulizer, int m, int n) {
         this.stepSize = stepSize;
         this.regulizer = regulizer;
+        this.m = m;
+        this.n = n;
         this.rand = new Random();
     }
 
@@ -25,21 +29,20 @@ public class NomadCompute extends Compute<Tuple2, INDArray> {
         INDArray h = (INDArray) context.getByKey("h");
 
 
-        int i = rand.nextInt((int) context.getByKey("m"));
-        int j = rand.nextInt((int) context.getByKey("n"));
+        int i = rand.nextInt(this.m);
+        int j = rand.nextInt(this.n);
+
         double aDataPoint = input.getDouble(i,j);
 
         double aW = aDataPoint - (w.getRow(i).mmul(h.getColumn(j)).getDouble(0));
         INDArray updateW =h.getColumn(j).mul(aW).transpose();
         updateW = updateW.add(w.getRow(i).mul(regulizer));
         updateW = updateW.mul(stepSize);
-        updateW = w.getRow(i).sub(updateW);
 
         double aH = aDataPoint - (w.getRow(i).mmul(h.getColumn(j)).getDouble(0)) ;
-        INDArray updateH =w.getRow(i).mul(aW).transpose();
+        INDArray updateH =w.getRow(i).mul(aH).transpose();
         updateH = updateH.add(h.getColumn(j).mul(regulizer));
         updateH = updateH.mul(stepSize);
-        updateH = h.getColumn(j).sub(updateH);
 
         context.put("i",i);
         context.put("j",j);
