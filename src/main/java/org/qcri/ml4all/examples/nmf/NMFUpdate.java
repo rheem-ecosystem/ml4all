@@ -1,13 +1,17 @@
 package org.qcri.ml4all.examples.nmf;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.ops.transforms.Transforms;
 import org.qcri.ml4all.abstraction.api.UpdateLocal;
 import org.qcri.ml4all.abstraction.plan.context.ML4allContext;
 import org.qcri.rheem.basic.data.Tuple2;
 
 public class NMFUpdate extends UpdateLocal<Tuple2<INDArray, INDArray>, Tuple2<INDArray, INDArray>> {
-
-    public NMFUpdate() { }
+    double max;
+    public NMFUpdate(double max) {
+        this.max = max;
+    }
 
 
     @Override
@@ -18,7 +22,10 @@ public class NMFUpdate extends UpdateLocal<Tuple2<INDArray, INDArray>, Tuple2<IN
         int j = (int)context.getByKey("j");
 
         INDArray updateW = w.getRow(i).sub(input.getField0());
+        updateW = Transforms.max(updateW, max, true);
+
         INDArray updateH = h.getColumn(j).sub(input.getField1());
+        updateH = Transforms.max(updateH, max, true);
 
         w.putRow(i, updateW);
         h.putColumn(j, updateH);
@@ -34,4 +41,7 @@ public class NMFUpdate extends UpdateLocal<Tuple2<INDArray, INDArray>, Tuple2<IN
         context.put("iter", ++iteration);
         return context;
     }
+
+
+
 }

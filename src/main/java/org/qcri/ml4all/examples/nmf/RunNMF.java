@@ -27,7 +27,7 @@ public class RunNMF {
 
     static double regulizer = 1.0;
     static double stepSize = 1.0;
-
+    static double max = 0.0;
 
     public static void main (String... args) throws MalformedURLException {
 
@@ -44,17 +44,16 @@ public class RunNMF {
         ML4allPlan plan = new ML4allPlan();
         plan.setDatasetsize(datasetSize);
         char delimiter = ',';
-        plan.setTransformOp(new NMFTransform(delimiter, datasetSize, features ));
+        plan.setTransformOp(new NMFTransform(delimiter));
         plan.setLocalStage(new NMFStageWithRandomValues(k, datasetSize, features));
         plan.setSampleOp(new NMFSample());
         plan.setComputeOp(new NMFCompute(stepSize, regulizer, datasetSize, features));
-        plan.setUpdateLocalOp(new NMFUpdate());
+        plan.setUpdateLocalOp(new NMFUpdate(max));
         plan.setLoopOp(new NMFLoop(max_iterations));
 
         ML4allContext context = plan.execute(file, platform, propertiesFile);
         System.out.println("Training finished in " + (System.currentTimeMillis() - start_time));
         System.out.println(context);
-        System.out.println("Weights:" + Arrays.toString((double [])context.getByKey("weights")));
     }
 
     private static void setClassVariables(String... args){

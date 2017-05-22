@@ -13,7 +13,6 @@ public class NMFSample extends Sample {
 
     @Override
     public SampleOperator.Methods sampleMethod() {
-
         return SampleOperator.Methods.RANDOM;
     }
 }
