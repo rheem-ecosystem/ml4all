@@ -6,20 +6,24 @@ import org.qcri.ml4all.abstraction.api.Compute;
 import org.qcri.ml4all.abstraction.plan.context.ML4allContext;
 import org.qcri.rheem.basic.data.Tuple2;
 
+import java.util.HashMap;
 import java.util.Random;
 
 public class NMFCompute extends Compute<Tuple2, double[]> {
 
-    double stepSize = 1.0;
     double regulizer = 1.0;
     int m;
     int n;
+    double alfa;
+    double beta;
     Random rand;
-    public NMFCompute(double stepSize, double regulizer, int m, int n) {
-        this.stepSize = stepSize;
+    public NMFCompute(double regulizer, int m, int n, double alfa, double beta) {
         this.regulizer = regulizer;
         this.m = m;
         this.n = n;
+        this.alfa = alfa;
+        this.beta = beta;
+
         this.rand = new Random();
     }
 
@@ -31,6 +35,8 @@ public class NMFCompute extends Compute<Tuple2, double[]> {
 
         int i = (int)input[0];
         int j = rand.nextInt(this.n) + 1;
+
+        double stepSize = this.getStepSize(context, i, j);
 
         double aDataPoint = input[j];
 
@@ -49,5 +55,21 @@ public class NMFCompute extends Compute<Tuple2, double[]> {
         context.put("j",j);
 
         return new Tuple2(updateW, updateH);
+    }
+
+
+    private double getStepSize(ML4allContext context, int i, int j){
+        HashMap<String, Integer>indexIter =  (HashMap)context.getByKey("indexIter");
+        String key = i+","+j;
+        int updatedIteration = 0;
+
+        if(indexIter.containsKey(key)){
+            updatedIteration = indexIter.get(key);
+        }
+        updatedIteration++;
+
+        indexIter.put(key, updatedIteration);
+
+        return this.alfa / (1+ (this.beta * Math.pow(updatedIteration, 1.5))) ;
     }
 }

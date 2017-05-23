@@ -26,8 +26,9 @@ public class RunNMF {
     static Platforms platform = SPARK_JAVA;
 
     static double regulizer = 1.0;
-    static double stepSize = 1.0;
     static double max = 0.0;
+    static double alfa= 0.0;
+    static double beta = 0.0;
 
     public static void main (String... args) throws MalformedURLException {
 
@@ -47,7 +48,7 @@ public class RunNMF {
         plan.setTransformOp(new NMFTransform(delimiter));
         plan.setLocalStage(new NMFStageWithRandomValues(k, datasetSize, features));
         plan.setSampleOp(new NMFSample());
-        plan.setComputeOp(new NMFCompute(stepSize, regulizer, datasetSize, features));
+        plan.setComputeOp(new NMFCompute(regulizer, datasetSize, features, alfa, beta));
         plan.setUpdateLocalOp(new NMFUpdate(max));
         plan.setLoopOp(new NMFLoop(max_iterations));
 
@@ -63,8 +64,9 @@ public class RunNMF {
             features = Integer.parseInt(args[2]);
             max_iterations = Integer.parseInt(args[3]);
             regulizer = Double.parseDouble(args[4]);
-            stepSize = Double.parseDouble(args[5]);
-            String platformIn = args[6];
+            alfa = Double.parseDouble(args[5]);
+            beta = Double.parseDouble(args[6]);
+            String platformIn = args[7];
             switch (platformIn) {
                 case "spark":
                     platform = SPARK;
