@@ -8,9 +8,9 @@ import org.qcri.ml4all.abstraction.plan.context.ML4allContext;
 import org.qcri.rheem.basic.data.Tuple2;
 
 public class NMFUpdate extends UpdateLocal<Tuple2<INDArray, INDArray>, Tuple2<INDArray, INDArray>> {
-    double max;
-    public NMFUpdate(double max) {
-        this.max = max;
+    double lower_bound;
+    public NMFUpdate(double lower_bound) {
+        this.lower_bound = lower_bound;
     }
 
 
@@ -22,10 +22,10 @@ public class NMFUpdate extends UpdateLocal<Tuple2<INDArray, INDArray>, Tuple2<IN
         int j = (int)context.getByKey("j");
 
         INDArray updateW = w.getRow(i).sub(input.getField0());
-        updateW = Transforms.max(updateW, max, true);
+        updateW = Transforms.max(updateW, lower_bound, true);
 
         INDArray updateH = h.getColumn(j).sub(input.getField1());
-        updateH = Transforms.max(updateH, max, true);
+        updateH = Transforms.max(updateH, lower_bound, true);
 
         w.putRow(i, updateW);
         h.putColumn(j, updateH);

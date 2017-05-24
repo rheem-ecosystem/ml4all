@@ -34,21 +34,26 @@ public class NMFCompute extends Compute<Tuple2, double[]> {
         INDArray h = (INDArray) context.getByKey("h");
 
         int i = (int)input[0];
-        int j = rand.nextInt(this.n) + 1;
+        int j = getRandomIndexPointer(1, this.n -1);
 
+        System.out.println("i : " + i + "   ========   j: " + j);
         double stepSize = this.getStepSize(context, i, j);
 
         double aDataPoint = input[j];
 
         double aW = aDataPoint - (w.getRow(i).mmul(h.getColumn(j)).getDouble(0));
+        System.out.println("inner project: " + w.getRow(i).mmul(h.getColumn(j)));
+
         INDArray updateW =h.getColumn(j).mul(aW).transpose();
         updateW = updateW.add(w.getRow(i).mul(regulizer));
         updateW = updateW.mul(stepSize);
 
 
         double aH = aDataPoint - (w.getRow(i).mmul(h.getColumn(j)).getDouble(0)) ;
+        System.out.println("inner project: " + w.getRow(i).mmul(h.getColumn(j)));
+
         INDArray updateH =w.getRow(i).mul(aH).transpose();
-        updateH = updateH.add(h.getColumn(j).mul(regulizer));
+        updateH = updateH.add( h.getColumn(j).mul(regulizer));
         updateH = updateH.mul(stepSize);
 
         context.put("i",i);
@@ -58,6 +63,10 @@ public class NMFCompute extends Compute<Tuple2, double[]> {
     }
 
 
+    private int getRandomIndexPointer(int min, int max){
+        // inclusive min and max
+        return min+(int)(Math.random()*((max-min ) + 1));
+    }
     private double getStepSize(ML4allContext context, int i, int j){
         HashMap<String, Integer>indexIter =  (HashMap)context.getByKey("indexIter");
         String key = i+","+j;
