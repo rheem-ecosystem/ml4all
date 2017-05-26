@@ -12,12 +12,14 @@ import org.qcri.rheem.basic.operators.SampleOperator;
 import org.qcri.rheem.core.api.Configuration;
 import org.qcri.rheem.core.api.RheemContext;
 import org.qcri.rheem.core.function.PredicateDescriptor;
+import org.qcri.rheem.core.types.DataSetType;
 import org.qcri.rheem.core.util.ReflectionUtils;
 import org.qcri.rheem.core.util.RheemCollections;
 import org.qcri.rheem.core.util.Tuple;
 import org.qcri.rheem.java.Java;
 import org.qcri.rheem.java.platform.JavaPlatform;
 import org.qcri.rheem.spark.Spark;
+import org.qcri.rheem.spark.operators.SparkBernoulliSampleOperator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -166,7 +168,8 @@ public class ML4allPlan {
                         DataQuantaBuilder sampledData;
                         if (hasSample()) //sample data first
                             sampledData = transformBuilder
-                                    .sample(sampleOp.sampleSize()).withSampleMethod(sampleOp.sampleMethod()).withDatasetSize(datasetsize).withBroadcast(ctx, "context").withTargetPlatform(Spark.platform());
+//                                    .sample(sampleOp.sampleSize()).withSampleMethod(sampleOp.sampleMethod()).withDatasetSize(datasetsize).withBroadcast(ctx, "context").withTargetPlatform(Spark.platform());
+                                    .customOperator(new SampleOperator(iter -> sampleOp.sampleSize(), DataSetType.createDefault(Void.class), sampleOp.sampleMethod(), iter -> 42 +1));
                         else //sampled data is entire dataset
                             sampledData = transformBuilder;
 
