@@ -13,4 +13,9 @@ public abstract class Sample extends LogicalOperator {
     /* specify which Sample method to use */
     public abstract SampleOperator.Methods sampleMethod();
 
+    /* specify seed as a function of the current iteration */
+    public long seed(long currentIteration) {
+        return System.nanoTime();           // by default uses the nano-time in each iteration
+    }
+
 }
