@@ -5,23 +5,25 @@ import org.qcri.ml4all.abstraction.api.Loop;
 import org.qcri.ml4all.abstraction.plan.context.ML4allContext;
 import org.qcri.rheem.basic.data.Tuple2;
 
-public class NMFLoop extends Loop<Tuple2<INDArray, INDArray>, Tuple2<INDArray, INDArray>> {
+public class NMFLoop extends Loop<Double, Tuple2<INDArray, INDArray>> {
 
     public int maxIterations;
     int currentIteration;
+    double minRMSC;
 
-    public NMFLoop(int maxIterations) {
+    public NMFLoop(int maxIterations, double minRMSC) {
         this.maxIterations = maxIterations;
+        this.minRMSC = minRMSC;
     }
 
     @Override
-    public Tuple2 prepareConvergenceDataset(Tuple2 input, ML4allContext context) {
-        return new Tuple2(input.getField0(), input.getField1());
+    public Double prepareConvergenceDataset(Tuple2 input, ML4allContext context) {
+        return (double)context.getByKey("rmsc");
     }
 
     @Override
-    public boolean terminate(Tuple2 input) {
-        return ++currentIteration >= maxIterations;
+    public boolean terminate(Double input) {
+        return (input < minRMSC || ++currentIteration >= maxIterations);
     }
 
 }

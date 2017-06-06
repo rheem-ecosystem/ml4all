@@ -12,26 +12,29 @@ import java.util.Map;
 public class NMFTransform extends Transform<double[] , String> {
 
     char separator = ',';
-
+    int index_i = 0;
     public NMFTransform(char separator) {
+
         this.separator = separator;
     }
 
     @Override
     public double[] transform(String input) {
-        // assume it has id
-
         List<String> pointStr = StringUtil.split(input, separator);
-        double[] point = new double[pointStr.size()];
 
-        // to get i value. will be replaced when we know input file format
-        point[0] = Double.parseDouble(String.valueOf(pointStr.get(0).charAt(pointStr.get(0).length() - 1)));
+        //i,j,value
+        double[] point = new double[3];
 
-        for(int i=1; i < pointStr.size(); i++){
-            point[i] = Double.parseDouble(pointStr.get(i));
-        }
-
+        point[0] = index_i;
+        int j = this.getRandomIndexPointer(0, pointStr.size() -1);
+        point[1] = j;
+        point[2] = Double.parseDouble(pointStr.get(j));
+        index_i++;
         return point;
+    }
+
+    private int getRandomIndexPointer(int min, int max){
+        return min+(int)(Math.random()*((max-min ) + 1));
     }
 
 }
