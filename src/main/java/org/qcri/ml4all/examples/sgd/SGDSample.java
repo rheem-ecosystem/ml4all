@@ -17,4 +17,9 @@ public class SGDSample extends Sample {
     public SampleOperator.Methods sampleMethod() {
         return SampleOperator.Methods.ANY;
     }
+
+    @Override
+    public long seed(long iter) {
+        return iter + 42;
+    }
 }

@@ -21,8 +21,8 @@ public class RunSGD {
     static int features = 123;
 
     //these are for SGD/mini run to convergence
-    static double accuracy = 0.1;
-    static int max_iterations = 10;
+    static double accuracy = 0.001;
+    static int max_iterations = 1000;
     static Platforms platform = SPARK_JAVA;
 
 
@@ -70,7 +70,7 @@ public class RunSGD {
         //logical operators of template
         plan.setTransformOp(new LibSVMTransform(features));
         plan.setLocalStage(new SGDStageWithZeros(features));
-//        plan.setSampleOp(new SGDSample());
+        plan.setSampleOp(new SGDSample());
         plan.setComputeOp(new ComputeLogisticGradient());
         plan.setUpdateLocalOp(new WeightsUpdate());
         plan.setLoopOp(new SGDLoop(accuracy, max_iterations));
