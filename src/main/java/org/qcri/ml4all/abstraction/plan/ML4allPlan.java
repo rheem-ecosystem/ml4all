@@ -168,8 +168,7 @@ public class ML4allPlan {
                         DataQuantaBuilder sampledData;
                         if (hasSample()) //sample data first
                             sampledData = transformBuilder
-//                                    .sample(sampleOp.sampleSize()).withSampleMethod(sampleOp.sampleMethod()).withDatasetSize(datasetsize).withBroadcast(ctx, "context").withTargetPlatform(Spark.platform());
-                                    .customOperator(new SampleOperator(iter -> sampleOp.sampleSize(), DataSetType.createDefault(Void.class), sampleOp.sampleMethod(), iter -> 42 +1));
+                                    .customOperator(new SampleOperator(iter -> sampleOp.sampleSize(), DataSetType.createDefault(Void.class), sampleOp.sampleMethod(), iter -> sampleOp.seed(iter)));
                         else //sampled data is entire dataset
                             sampledData = transformBuilder;
 
