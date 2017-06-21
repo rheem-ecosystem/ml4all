@@ -5,14 +5,23 @@ import org.qcri.rheem.basic.operators.SampleOperator;
 
 public class NMFSample extends Sample {
 
+    int sample_size;
+    public NMFSample(int sample_size) {
+        this.sample_size = sample_size;
+    }
 
     @Override
     public int sampleSize() {
-        return 1;
+        return this.sample_size;
     }
 
     @Override
     public SampleOperator.Methods sampleMethod() {
         return SampleOperator.Methods.RANDOM;
+    }
+
+    @Override
+    public long seed(long iter) {
+        return iter + 42;
     }
 }

@@ -6,6 +6,7 @@ import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.qcri.ml4all.abstraction.api.LocalStage;
 import org.qcri.ml4all.abstraction.plan.context.ML4allContext;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,43 +18,64 @@ public class NMFStageWithRandomValues extends LocalStage {
     double max;
     int[] wShape;
     int[] hShape;
-    INDArray testSet;
+    int seed;
+    int m;
+    int n;
     INDArray trainingSet;
 
-    public NMFStageWithRandomValues(int k, String source, char delimiter) {
-        this.loadSourceData(source, delimiter);
+    public NMFStageWithRandomValues(int k, String source, char delimiter, int seed) {
+        if(source.toLowerCase().endsWith(".bin")){
+            this.loadBinarySourceData(source);
+        }
+        else{
+            this.loadSourceData(source, delimiter);
+        }
+
         int m = trainingSet.rows();
         int n = trainingSet.columns();
-        this.max = Math.sqrt(k);
+        this.max =(1.0 / Math.sqrt(k));
         this.wShape = new int[]{m, k};
-        this.hShape = new int[]{k, n};
+        this.hShape = new int[]{n, k};
+        this.seed = seed;
 
+    }
+
+    public NMFStageWithRandomValues(int k, int seed, int m, int n) {
+
+        this.wShape = new int[]{m, k};
+        this.hShape = new int[]{n, k};
+        this.seed = seed;
+        this.max =(1.0 / Math.sqrt(k));
     }
 
     @Override
     public void staging (ML4allContext context) {
-
+        Nd4j.getRandom().setSeed(this.seed);
         INDArray w = Nd4j.rand(wShape, min, max, Nd4j.getRandom());
         INDArray h = Nd4j.rand(hShape, min, max, Nd4j.getRandom());
+        h = h.transpose();
 
         context.put("w", w);
-        context.put("h", h);;
-        context.put("iter", 1);
-        context.put("testSet", this.testSet);
+        context.put("h", h);
     }
 
 
 
     private void loadSourceData(String path, char delimiter) {
-        INDArray docData = null;
         try {
-            docData = Nd4j.readNumpy(path, String.valueOf(delimiter));
-            Nd4j.shuffle(docData, new Random(123), 1);
+            this.trainingSet = Nd4j.readNumpy(path, String.valueOf(delimiter));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-            int count = (int) (docData.rows() * 0.8);
+    }
 
-            this.trainingSet = docData;
-            this.testSet = docData.get(NDArrayIndex.interval(count, docData.rows() - 1), NDArrayIndex.all());
+    private void loadBinarySourceData(String path) {
+        try {
+           // INDArray documentMaster  = Nd4j.readBinary
+            // (new File("/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apg_filter_batch_300_f.bin"));
+
+            this.trainingSet = Nd4j.readBinary(new File(path));
         } catch (IOException e) {
             e.printStackTrace();
         }

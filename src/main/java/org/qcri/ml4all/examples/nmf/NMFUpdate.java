@@ -7,11 +7,9 @@ import org.qcri.ml4all.abstraction.api.UpdateLocal;
 import org.qcri.ml4all.abstraction.plan.context.ML4allContext;
 import org.qcri.rheem.basic.data.Tuple2;
 
-public class NMFUpdate extends UpdateLocal<Tuple2<INDArray, INDArray>, Tuple2<INDArray, INDArray>> {
+public class NMFUpdate extends UpdateLocal<Double, Tuple2<Tuple2<INDArray, INDArray>, Tuple2<int[], Double>>> {
     double lower_bound;
-    int omegaTest;
-    static INDArray trainingDocument = null;
-    
+    int index = 1;
     public NMFUpdate(double lower_bound) {
         this.lower_bound = lower_bound;
 
@@ -19,73 +17,47 @@ public class NMFUpdate extends UpdateLocal<Tuple2<INDArray, INDArray>, Tuple2<IN
 
 
     @Override
-    public Tuple2<INDArray, INDArray> process(Tuple2<INDArray, INDArray> input, ML4allContext context) {
+    public Double process(Tuple2<Tuple2<INDArray, INDArray>, Tuple2<int[], Double>> input, ML4allContext context) {
+        int[] pointer = input.getField1().field0;
+        int i = pointer[0];
+        int j = pointer[1];
+        System.out.println("update index : " + index + "   ===>  " + i + "," + j);
 
-        if(trainingDocument == null){
-            trainingDocument = (INDArray)context.getByKey("testSet");
-            this.omegaTest = this.calculateOmegavValue();
+        index++;
+        boolean updateWH = false;
+
+        Tuple2<INDArray, INDArray> matrixs = input.getField0();
+        if(matrixs.getField0() != null || matrixs.getField1() != null){
+            INDArray w = (INDArray)context.getByKey("w");
+            INDArray h = (INDArray)context.getByKey("h");
+
+
+            INDArray aW = matrixs.getField0();
+            INDArray aH = matrixs.getField1();
+
+            INDArray updateW = w.getRow(i).add(aW);
+            INDArray updateH = h.getColumn(j).add(aH);
+            updateW = Transforms.max(updateW, lower_bound, true);
+            updateH = Transforms.max(updateH, lower_bound, true);
+
+            w.putRow(i, updateW);
+            h.putColumn(j, updateH);
+
+            context.put("w", w);
+            context.put("h", h);
+
+            return input.getField1().field1;
+        }
+        else{
+            return 0.0;
         }
 
-        INDArray h = (INDArray) context.getByKey("h");
-        INDArray w = (INDArray) context.getByKey("w");
-        int i = (int)context.getByKey("i");
-        int j = (int)context.getByKey("j");
-        int currentItr = (int)context.getByKey("iter");
-        int k = currentItr % 50;
 
-        INDArray updateW = Transforms.max(w.getRow(i).sub(input.getField0()), lower_bound, true);
-        INDArray updateH = Transforms.max(h.getColumn(j).sub(input.getField1()), lower_bound, true);
-
-        w.putRow(i, updateW);
-        h.putColumn(j, updateH);
-
-        if(k == 0 || currentItr == 1) {
-            double rmscValue = this.calcualteRMSE(i, j, w, h);
-            System.out.println(rmscValue);
-            context.put("rmsc", rmscValue);
-        }
-
-        return new Tuple2<>(w, h);
     }
 
     @Override
-    public ML4allContext assign(Tuple2<INDArray, INDArray> input, ML4allContext context) {
-        context.put("w", input.field0);
-        context.put("h", input.field1);
-        int iteration = (int) context.getByKey("iter");
-        context.put("iter", ++iteration);
+    public ML4allContext assign(Double input, ML4allContext context) {
         return context;
-    }
-
-
-    private double calcualteRMSE(int row_i, int col_j, INDArray w, INDArray h) {
-
-        double s = 0.0;
-        for (int i = 0; i < this.trainingDocument.rows(); i++) {
-            for (int j = 0; j < this.trainingDocument.columns(); j++) {
-                if(this.trainingDocument.getDouble(row_i, col_j) > 0){
-                    double s1 = this.trainingDocument.getDouble(row_i, col_j) - (w.getRow(row_i).mmul(h.getColumn(col_j))).getDouble(0);
-                    s = s + Math.pow(s1, 2);
-                }
-            }
-        }
-
-        double s2 = s / omegaTest;
-
-        return Math.sqrt(s2);
-    }
-
-    private int calculateOmegavValue(){
-        int nonZeroValueCount = 0;
-        for(int i =0; i < this.trainingDocument.rows(); i++){
-            for(int j=0; j < this.trainingDocument.columns(); j++){
-                if(this.trainingDocument.getDouble(i,j) > 0.0){
-                    nonZeroValueCount++;
-                }
-            }
-        }
-
-        return nonZeroValueCount;
     }
 
 }

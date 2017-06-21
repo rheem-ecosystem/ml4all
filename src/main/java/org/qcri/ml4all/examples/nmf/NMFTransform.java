@@ -12,9 +12,9 @@ import java.util.Map;
 public class NMFTransform extends Transform<double[] , String> {
 
     char separator = ',';
-    int index_i = 0;
-    public NMFTransform(char separator) {
+    static int index_i = 0;
 
+    public NMFTransform(char separator) {
         this.separator = separator;
     }
 
@@ -23,18 +23,18 @@ public class NMFTransform extends Transform<double[] , String> {
         List<String> pointStr = StringUtil.split(input, separator);
 
         //i,j,value
-        double[] point = new double[3];
+        double[] point = new double[pointStr.size() + 1];
 
         point[0] = index_i;
-        int j = this.getRandomIndexPointer(0, pointStr.size() -1);
-        point[1] = j;
-        point[2] = Double.parseDouble(pointStr.get(j));
+
+        for(int i=0; i < pointStr.size(); i++){
+            point[i+1] = Double.parseDouble(pointStr.get(i));
+        }
+
         index_i++;
+
         return point;
     }
 
-    private int getRandomIndexPointer(int min, int max){
-        return min+(int)(Math.random()*((max-min ) + 1));
-    }
 
 }

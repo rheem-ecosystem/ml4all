@@ -6,22 +6,21 @@ import org.qcri.ml4all.abstraction.plan.context.ML4allContext;
 import org.qcri.rheem.basic.data.Tuple2;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
-public class NMFCompute extends Compute<Tuple2, double[]> {
+public class NMFCompute extends Compute<Tuple2<Tuple2, int[]>, double[]> {
 
-    private double regulizer;
-    private double alpha;
-    private double beta;
-
+    private double beta =  0.01;
+    private static int itr = 1;
+    private int k;
     private static Map<String, Integer> indexIter;
 
-    public NMFCompute(double regulizer,double alpha, double beta) {
-        this.regulizer = regulizer;
-        this.alpha = alpha;
-        this.beta = beta;
 
+    public NMFCompute(double beta, int k) {
+        this.beta = beta;
+        this.k = k;
         indexIter = new HashMap<>();
 
     }
@@ -31,61 +30,45 @@ public class NMFCompute extends Compute<Tuple2, double[]> {
         INDArray updateW = null;
         INDArray updateH = null;
 
-        INDArray w = (INDArray) context.getByKey("w");
-        INDArray h = (INDArray) context.getByKey("h");
+        System.out.println("compute index " + itr);
+        int[] point = new int[2];
 
         int i = (int)input[0];
-        int j = (int)input[1];
+        int j = this.getRandomIndexPointer(0, k);
 
-        double aDataPoint = input[2];
-        double stepSize = this.getStepSize(context, i, j);
+        double aDataPoint = input[j];
+
+        point[0] = i;
+        point[1] = j;
+        System.out.println("i, j ==>  " + i + "," + j);
+        double alpha = this.setStepSize();
+        itr++;
+        if(aDataPoint <= 0){
+           return new Tuple2(new Tuple2(updateW, updateH), new Tuple2(point, 0.0));
+        }
+
+        INDArray w = (INDArray)context.getByKey("w");
+        INDArray h = (INDArray)context.getByKey("h");
 
         double aW = aDataPoint - (w.getRow(i).mmul(h.getColumn(j)).getDouble(0));
 
-        updateW = w.getRow(i).sub(
-                (
-                        ((h.getColumn(j).mul(aW))
-                                .add(
-                                        (
-                                                w.getRow(i).mul(this.regulizer)
-                                        ).transpose()
-                                ))
-                                .mul(stepSize)
-                )
-        );
 
-        double aWH = aDataPoint - (updateW.mmul(h.getColumn(j)).getDouble(0));
+        updateW = ((h.getColumn(j).mul(aW)).sub(w.getRow(i).mul(beta))).mul(alpha).transpose();
 
-        updateH =((w.getRow(i).mul(aWH))
-                    .add(
-                            (
-                                    h.getColumn(j).mul(this.regulizer)
-                            ).transpose()
-                    )
-                )
-                .mul(stepSize);
+        updateH = ((w.getRow(i).mul(aW)).sub(h.getColumn(j).mul(beta))).mul(alpha).transpose();
 
-        context.put("i",i);
-        context.put("j",j);
-
-        return new Tuple2(updateW, updateH);
+        return new Tuple2(new Tuple2(updateW, updateH), new Tuple2(point, aW));
     }
 
+    private double setStepSize(){
+        double stepSize = (20.0 / (itr+10.0));
 
-    private double getStepSize(ML4allContext context, int i, int j){
+        return stepSize;
 
-        String key = i+","+j;
-        int updatedIteration = 0;
-
-        if(indexIter.containsKey(key)){
-            updatedIteration = indexIter.get(key);
-        }
-        updatedIteration++;
-
-        indexIter.put(key, updatedIteration);
-
-        return this.alpha / (1+ (this.beta * Math.pow(updatedIteration, 1.5))) ;
     }
 
+    private int getRandomIndexPointer(int min, int max){
+        return min+(int)(Math.random()*((max-min ) + 1));
+    }
 
 }
