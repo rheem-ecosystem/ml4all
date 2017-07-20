@@ -3,13 +3,14 @@ package org.qcri.ml4all.examples.nmf;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.qcri.ml4all.abstraction.plan.ML4allPlan;
-import org.qcri.ml4all.abstraction.plan.ML4allPlanNew;
 import org.qcri.ml4all.abstraction.plan.Platforms;
 import org.qcri.ml4all.abstraction.plan.context.ML4allContext;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.sql.Timestamp;
+import java.util.Date;
 
 
 import static org.qcri.ml4all.abstraction.plan.Platforms.*;
@@ -18,21 +19,23 @@ import static org.qcri.ml4all.abstraction.plan.Platforms.*;
  * Execute SGD for nmf.
  */
 public class RunNMF {
-///Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apgRandomTest.txt
-    static String relativePath = "src/main/resources/input/apgNoHeaderInfoBigTable.txt";
+///Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apgNoHeaderInfoBigTable.txt
+    ///Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apg_big_table.csv
+    static String relativePath = "src/main/resources/input/apg_big_table.csv";
+    static String outputPath = "/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/out/";
+    static String path = "/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apg_big_table.csv";
     static int datasetSize  = 2509;
     static int features = 10499;
     static int k = 5;
 
-    static int max_iterations = datasetSize * features;
     static Platforms platform = JAVA;
 
     static double lower_bound = 0.0;
-    static double alfa= 1;
     static double beta = 0.01;
     static double minRMSC = 0.001;
     static int seed = 1234;
-    static int epoch = 400;
+    static int epoch = 10;
+
     public static void main (String... args) throws MalformedURLException {
 
         try {
@@ -46,7 +49,7 @@ public class RunNMF {
 
     private static void printResult(ML4allContext context, String f){
         try{
-            String outputPath = "/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/out/";
+            System.out.println(context);
 
             INDArray w = (INDArray)context.getByKey("w");
             INDArray h = (INDArray)context.getByKey("h");
@@ -54,9 +57,9 @@ public class RunNMF {
 
             System.out.println(R.getRow(0));
 
-            File fs4 = new File(outputPath +"apg_nmf_all.bin");
-            File fs4w = new File(outputPath +"apg_nmf_all_w.bin");
-            File fs4h = new File(outputPath +"apg_nmf_all_h.bin");
+            File fs4 = new File(outputPath +"apg_nmf_ml4all_all.bin");
+            File fs4w = new File(outputPath +"apg_nmf_ml4all_all_w.bin");
+            File fs4h = new File(outputPath +"apg_nmf_ml4all_all_h.bin");
 
             Nd4j.writeTxt(R, new File(f).getName() );
 
@@ -71,18 +74,13 @@ public class RunNMF {
 
 
     private static void ml4AllConfig(String... args) throws Exception{
+
          String propertiesFile = new File("src/main/resources/rheem.properties").getAbsoluteFile().toURI().toURL().toString();
 
          try {
-
-             //String path = "/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apgRandomTest.txt";
-             String path = "/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apgNoHeaderInfoBigTable.txt";
-
              setClassVariables(args);
 
              String file = new File(relativePath).getAbsoluteFile().toURI().toURL().toString();
-
-             System.out.println("max #maxIterations - epoch:" + max_iterations);
 
              long start_time = System.currentTimeMillis();
 
@@ -90,17 +88,18 @@ public class RunNMF {
              plan.setDatasetsize(datasetSize);
              char delimiter = ',';
              plan.setTransformOp(new NMFTransform(delimiter));
-             plan.setLocalStage(new NMFStageWithRandomValues(k, path, delimiter, seed));
-             //plan.setLocalStage(new NMFStageWithRandomValues(k,seed, datasetSize, features));
+             plan.setLocalStage(new NMFStageWithRandomValues(k,seed, datasetSize, features));
              plan.setSampleOp(new NMFSample(1));
              plan.setComputeOp(new NMFCompute(beta, k));
              plan.setUpdateLocalOp(new NMFUpdate(lower_bound));
-             //plan.setUpdateOp(new NMFUpdate(lower_bound));
              plan.setLoopOp(new NMFLoop(datasetSize, features, minRMSC, epoch));
+
+
+             System.out.println(new Timestamp(new Date().getTime()));
 
              ML4allContext context = plan.execute(file, platform, propertiesFile);
              System.out.println("Training finished in " + (System.currentTimeMillis() - start_time));
-             System.out.println(context);
+             System.out.println(new Timestamp(new Date().getTime()));
              printResult(context, file);
 
          } catch (IOException e) {
@@ -112,12 +111,7 @@ public class RunNMF {
     private static void setClassVariables(String... args){
         if (args.length > 0) {
             relativePath = args[0];
-            datasetSize = Integer.parseInt(args[1]);
-            features = Integer.parseInt(args[2]);
-            max_iterations = Integer.parseInt(args[3]);
-            alfa = Double.parseDouble(args[4]);
-            beta = Double.parseDouble(args[5]);
-            String platformIn = args[6];
+            String platformIn = args[1];
             switch (platformIn) {
                 case "spark":
                     platform = SPARK;
@@ -139,10 +133,9 @@ public class RunNMF {
         }
 
         try {
-            INDArray documentMaster = Nd4j.readNumpy("/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apgNoHeaderInfoBigTable.txt", ",");
+            INDArray documentMaster = Nd4j.readNumpy("/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apg_big_table.csv", ",");
             datasetSize = documentMaster.rows();
             features = documentMaster.columns();
-            max_iterations = datasetSize * features;
         } catch (IOException e) {
             e.printStackTrace();
         }

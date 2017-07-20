@@ -29,45 +29,41 @@ public class NMFJuliaBatchMatrixFactorization {
 
     String outputPath = "/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/out/";
 
-    int index = 1;
-    int iter = 1;
+    long index = 0;
+    long iter = 0;
     List<Double> items = new ArrayList<>();
     public NMFJuliaBatchMatrixFactorization() {
         this.init();
 
-        int itr = 400 *(w.rows() *h.columns());
-        //int itr = Math.max(w.rows(), h.columns()) * 400;
-        System.out.println("========>>>>>>>>>>>>>>>>>>>>>> ITR : " + itr);
-       // System.out.println(index);
         System.out.println(new Timestamp(new Date().getTime()));
-        while(index < itr){
+        long pointR =0;
+        int max_epoch =500;
+        while(pointR < max_epoch){
 
             this.compute();
            // System.out.println(index);
-            int r = index % (w.rows() *h.columns());
+            int r = (int)(index % (trainingDocument.rows() *trainingDocument.columns()));
+            pointR = index / (trainingDocument.rows() *trainingDocument.columns());
             if(r == 0){
                 System.out.println(new Timestamp(new Date().getTime()));
                 double currentRMSC = this.calcualteRMSE();
               //  if(currentRMSC > 0.0) {
-                    System.out.println(index + " , " + currentRMSC);
+                    System.out.println(index + "(" + pointR + ") , " + currentRMSC);
              //   }
 
             }
-
-
-
         }
         System.out.println(new Timestamp(new Date().getTime()));
-        System.out.println("calcualteRMSE:=============>>>>>>>> " + this.calcualteRMSE() );
+        System.out.println("Final RMSE:=============>>>>>>>> " + this.calcualteRMSE() );
 
-        this.generateOutput();
+        //this.generateOutput();
 
 
     }
 
     private void init(){
         try {
-            INDArray documentMaster = Nd4j.readNumpy("/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apgNoHeaderInfoBigTable.txt",",");
+            INDArray documentMaster = Nd4j.readNumpy("/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apg_big_table.csv",",");
             //this.trainingDocument  = documentMaster.get(NDArrayIndex.interval(0, 1000), NDArrayIndex.interval(0, 100));
 
            // INDArray documentMaster  = Nd4j.readBinary(new File("/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apg_filter_batch_300_f.bin"));
@@ -85,8 +81,8 @@ public class NMFJuliaBatchMatrixFactorization {
             this.w = Nd4j.rand(new int[]{this.datasetSize, this.k}, 0.0, max, Nd4j.getRandom());
             this.h = Nd4j.rand(new int[]{this.features,this.k}, 0.0, max, Nd4j.getRandom());
             this.h = this.h.transpose();
-            System.out.println(w);
-            System.out.println(h);
+           // System.out.println(w);
+           // System.out.println(h);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -99,13 +95,13 @@ public class NMFJuliaBatchMatrixFactorization {
         //System.out.println(w.mmul(h));
         try{
             INDArray R = w.mmul(h);
-            System.out.println("trainingDocument : " + trainingDocument.getDouble(10,45));
-            System.out.println("R : " + R.getDouble(10,45));
+            System.out.println("trainingDocument : " + trainingDocument.getDouble(2347,0));
+            System.out.println("R : " + R.getDouble(2347,0));
             System.out.println(trainingDocument.getRow(0));
             System.out.println(R.getRow(0));
-            File fs4 = new File(outputPath +"apg_Julia_all_s.bin");
-            File fs4w = new File(outputPath +"apg_Julia_all_s_w.bin");
-            File fs4h = new File(outputPath +"apg_Julia_all_s_h.bin");
+            File fs4 = new File(outputPath +"apg_Julia_1000_f_r.bin");
+            File fs4w = new File(outputPath +"apg_Julia_1000_f_w.bin");
+            File fs4h = new File(outputPath +"apg_Julia_1000_f_h.bin");
 
             Nd4j.saveBinary(R, fs4);
             Nd4j.saveBinary(w, fs4w);
@@ -133,8 +129,8 @@ public class NMFJuliaBatchMatrixFactorization {
             return;
         }
 
-       // double alpha = 20.0 / (iter+10.0);
-        double alpha = 0.022/iter;
+        double alpha = 20.0 / (iter+10.0);
+       // double alpha = 0.022/iter;
 
         double aW = aDataPoint - (w.getRow(i).mmul(h.getColumn(j)).getDouble(0));
         items.add(aW);

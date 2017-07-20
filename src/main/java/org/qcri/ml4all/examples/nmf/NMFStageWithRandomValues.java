@@ -19,8 +19,7 @@ public class NMFStageWithRandomValues extends LocalStage {
     int[] wShape;
     int[] hShape;
     int seed;
-    int m;
-    int n;
+
     INDArray trainingSet;
 
     public NMFStageWithRandomValues(int k, String source, char delimiter, int seed) {
@@ -51,8 +50,8 @@ public class NMFStageWithRandomValues extends LocalStage {
     @Override
     public void staging (ML4allContext context) {
         Nd4j.getRandom().setSeed(this.seed);
-        INDArray w = Nd4j.rand(wShape, min, max, Nd4j.getRandom());
-        INDArray h = Nd4j.rand(hShape, min, max, Nd4j.getRandom());
+        INDArray w = Nd4j.rand(this.wShape, this.min, this.max, Nd4j.getRandom());
+        INDArray h = Nd4j.rand(this.hShape, this.min, this.max, Nd4j.getRandom());
         h = h.transpose();
 
         context.put("w", w);

@@ -23,12 +23,12 @@ public class InspectMatrix {
        // generateRandomMatrix();
 
         ///Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apg_filter_batch_300_f.bin
-        File fs = new File("/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apg_filter_batch_300_f.bin");
+       // File fs = new File("/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apg_filter_batch_300_f.bin");
 
-        INDArray out = Nd4j.readBinary(fs);
+      //  INDArray out = Nd4j.readBinary(fs);
 
-       // INDArray org = Nd4j.readNumpy("/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apgRandomTest.txt",",");
-
+        INDArray out = Nd4j.readNumpy("/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apgRandomTest.txt", ",");
+    //    INDArray out =Nd4j.readTxt("/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/out/apg_400_post_H.csv",",");
         System.out.println(out);
 
         System.out.println("test");

@@ -21,10 +21,10 @@ public class NMFUpdate extends UpdateLocal<Double, Tuple2<Tuple2<INDArray, INDAr
         int[] pointer = input.getField1().field0;
         int i = pointer[0];
         int j = pointer[1];
-        System.out.println("update index : " + index + "   ===>  " + i + "," + j);
+      //  System.out.println("update index : " + index + "   ===>  " + i + "," + j);
 
         index++;
-        boolean updateWH = false;
+
 
         Tuple2<INDArray, INDArray> matrixs = input.getField0();
         if(matrixs.getField0() != null || matrixs.getField1() != null){
@@ -37,8 +37,8 @@ public class NMFUpdate extends UpdateLocal<Double, Tuple2<Tuple2<INDArray, INDAr
 
             INDArray updateW = w.getRow(i).add(aW);
             INDArray updateH = h.getColumn(j).add(aH);
-            updateW = Transforms.max(updateW, lower_bound, true);
-            updateH = Transforms.max(updateH, lower_bound, true);
+            updateW = Transforms.max(updateW, this.lower_bound, true);
+            updateH = Transforms.max(updateH, this.lower_bound, true);
 
             w.putRow(i, updateW);
             h.putColumn(j, updateH);

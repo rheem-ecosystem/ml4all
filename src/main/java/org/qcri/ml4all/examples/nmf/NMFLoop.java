@@ -5,58 +5,74 @@ import org.qcri.ml4all.abstraction.api.Loop;
 import org.qcri.ml4all.abstraction.plan.context.ML4allContext;
 import org.qcri.rheem.basic.data.Tuple2;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class NMFLoop extends Loop<Double, Double> {
 
-    int maxIterations;
-    int currentIteration;
+    long maxIterations;
+    long currentIteration = 1;
     double minRMSC;
-    double currentRMSC;
     int epoch;
     List<Double> items;
-    int epoch_Size ;
-    int currentItr = 1;
+    int per_epoch_size ;
+
     public NMFLoop(int datasetSize, int features, double minRMSC, int epoch) {
-        this.maxIterations = epoch * (datasetSize*features);
+
         this.minRMSC = minRMSC;
         this.epoch = epoch;
         this.items = new ArrayList<>();
-        this.epoch_Size = datasetSize*features;
+        this.per_epoch_size = datasetSize*features;
+        this.maxIterations =(datasetSize*features) * (long)epoch;
+        System.out.println("===  " + maxIterations + " , " + this.epoch + " , " + this.per_epoch_size + "   ===  ");
     }
 
     @Override
     public Double prepareConvergenceDataset(Double input, ML4allContext context) {
-        // calculate per epoch
         double rmsc = 0.0;
+       // System.out.println(this.currentIteration );
 
-        int k = this.currentItr % epoch_Size;
-        if(k == 0) {
+        if(input > 0.0){
             items.add(input);
-            if(items.size() > 0){
+        }
+
+        int k = (int)((this.currentIteration) % this.per_epoch_size);
+       // System.out.println("prepareConvergenceDataset k : " + k);
+/*
+        if((currentIteration) == 26341991){
+            System.out.println("prepareConvergenceDataset : " + currentIteration);
+        }
+*/
+
+        if(k == 0 ) {
+            System.out.println("items size : " + this.items.size() + " , " + new Timestamp(new Date().getTime()) );
+            System.out.println("epoch size : " + ((this.currentIteration) / this.per_epoch_size) + " , " + this.currentIteration);
+            if(this.items.size() > 0){
                 double s =0.0;
-                for(double item : items){
+                for(double item : this.items){
                     s = s + Math.pow(item, 2);
                 }
 
-                double s2 = s/items.size();
-                items.clear();
+                double s2 = s/this.items.size();
+
                 rmsc =  Math.sqrt(s2);
-                items.clear();
-            }
+                this.items.clear();
+
+               }
+            System.out.println("==============>>>>>>>>> " + new Timestamp(new Date().getTime())+ " , " + this.currentIteration + " , " + rmsc);
         }
-        this.currentItr++;
-        System.out.println("prepareConvergenceDataset:" + maxIterations + " , " + rmsc);
+
+
         return rmsc;
 
     }
 
     @Override
     public boolean terminate(Double input) {
-      //  return (input >= minRMSC || ++currentIteration >= maxIterations);
-        System.out.println(maxIterations + " , " + currentIteration);
-        return (++currentIteration >= maxIterations);
+        int current_epoch = (int)(this.currentIteration / this.per_epoch_size);
+        return ( ++this.currentIteration >= this.maxIterations || current_epoch >= this.epoch);
     }
 
 

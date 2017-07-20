@@ -13,16 +13,12 @@ import java.util.Map;
 public class NMFCompute extends Compute<Tuple2<Tuple2, int[]>, double[]> {
 
     private double beta =  0.01;
-    private static int itr = 1;
+    private static long itr = 1;
     private int k;
-    private static Map<String, Integer> indexIter;
-
 
     public NMFCompute(double beta, int k) {
         this.beta = beta;
         this.k = k;
-        indexIter = new HashMap<>();
-
     }
 
     @Override
@@ -30,7 +26,6 @@ public class NMFCompute extends Compute<Tuple2<Tuple2, int[]>, double[]> {
         INDArray updateW = null;
         INDArray updateH = null;
 
-        System.out.println("compute index " + itr);
         int[] point = new int[2];
 
         int i = (int)input[0];
@@ -40,7 +35,7 @@ public class NMFCompute extends Compute<Tuple2<Tuple2, int[]>, double[]> {
 
         point[0] = i;
         point[1] = j;
-        System.out.println("i, j ==>  " + i + "," + j);
+       // System.out.println("i, j ==>  " + i + "," + j);
         double alpha = this.setStepSize();
         itr++;
         if(aDataPoint <= 0){
@@ -53,9 +48,9 @@ public class NMFCompute extends Compute<Tuple2<Tuple2, int[]>, double[]> {
         double aW = aDataPoint - (w.getRow(i).mmul(h.getColumn(j)).getDouble(0));
 
 
-        updateW = ((h.getColumn(j).mul(aW)).sub(w.getRow(i).mul(beta))).mul(alpha).transpose();
+        updateW = ((h.getColumn(j).mul(aW)).sub(w.getRow(i).mul(this.beta))).mul(alpha).transpose();
 
-        updateH = ((w.getRow(i).mul(aW)).sub(h.getColumn(j).mul(beta))).mul(alpha).transpose();
+        updateH = ((w.getRow(i).mul(aW)).sub(h.getColumn(j).mul(this.beta))).mul(alpha).transpose();
 
         return new Tuple2(new Tuple2(updateW, updateH), new Tuple2(point, aW));
     }
