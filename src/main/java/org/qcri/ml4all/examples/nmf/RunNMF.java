@@ -20,7 +20,7 @@ import static org.qcri.ml4all.abstraction.plan.Platforms.*;
  */
 public class RunNMF {
 
-    static String samplePath = "src/main/resources/input/dummpy.txt";
+    static String samplePath = "src/main/resources/input/dummy.txt";
     static String outputPath = "/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/out/";
     static String path = "/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/aje_youtube_big_table_raw.csv";
     static String wPath ="/Users/jlucas/Documents/Dev_Python/nmn/w.csv";
@@ -96,8 +96,9 @@ public class RunNMF {
              ML4allPlan plan = new ML4allPlan();
              plan.setDatasetsize(datasetSize);
              char delimiter = ',';
+             // transform is not required so that we are passing dummpy data
              plan.setTransformOp(new NMFTransform(delimiter));
-             plan.setLocalStage(new NMFStageWithRandomValues(k,seed, datasetSize, features, avg, wPath, hPath, basedSeedVector));
+             plan.setLocalStage(new NMFStageWithRandomValues(alpha, k,seed, datasetSize, features, avg, wPath, hPath, basedSeedVector));
            //  plan.setSampleOp(new NMFSample(1));
              plan.setComputeOp(new NMFCompute(beta, datasetSize, features,documentMaster));
              plan.setUpdateLocalOp(new NMFUpdate(lower_bound));

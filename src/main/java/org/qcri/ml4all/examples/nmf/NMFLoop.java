@@ -71,7 +71,9 @@ public class NMFLoop extends Loop<Double, Double> {
             return true;
         }*/
         int current_epoch = (int)(this.currentIteration / this.perEpochSize);
-        return ( ++this.currentIteration >= this.maxIternation || current_epoch >= this.epoch);
+        //return ( ++this.currentIteration >= this.maxIternation || current_epoch >= this.epoch);
+
+        return ++this.currentIteration >= this.maxIternation;
     }
 
 

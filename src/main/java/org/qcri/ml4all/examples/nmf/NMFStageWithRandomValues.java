@@ -18,7 +18,7 @@ import java.util.Random;
 public class NMFStageWithRandomValues extends LocalStage {
 
     private static Logger logger = Logger.getLogger(NMFStageWithRandomValues.class);
-
+    double alpha = 0.02;
     int[] wShape;
     int[] hShape;
     int seed;
@@ -27,12 +27,14 @@ public class NMFStageWithRandomValues extends LocalStage {
     String hPath;
     boolean basedSeedVector = false;
 
-    public NMFStageWithRandomValues(int k, int seed, int m, int n, double avg, String wPath, String hPath, boolean basedSeedVector) {
+    public NMFStageWithRandomValues(double alpha, int k, int seed, int m, int n, double avg, String wPath, String hPath, boolean basedSeedVector) {
 
         this.wShape = new int[]{m, k};
         this.hShape = new int[]{n, k};
         this.seed = seed;
         this.avg = avg;
+        this.alpha = alpha;
+
         if(basedSeedVector) {
             this.basedSeedVector = basedSeedVector;
             this.wPath = wPath;
@@ -69,6 +71,7 @@ public class NMFStageWithRandomValues extends LocalStage {
         }
         context.put("w", w);
         context.put("h", h);
+        context.put("alpha", alpha);
     }
 
 }
