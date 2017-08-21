@@ -7,9 +7,12 @@ import org.qcri.ml4all.abstraction.api.UpdateLocal;
 import org.qcri.ml4all.abstraction.plan.context.ML4allContext;
 import org.qcri.rheem.basic.data.Tuple2;
 
+import java.sql.Timestamp;
+import java.util.Date;
+
 public class NMFUpdate extends UpdateLocal<Double, Tuple2<Tuple2<INDArray, INDArray>, Tuple2<int[], Double>>> {
     double lower_bound;
-    int index = 1;
+
     public NMFUpdate(double lower_bound) {
         this.lower_bound = lower_bound;
 
@@ -21,10 +24,6 @@ public class NMFUpdate extends UpdateLocal<Double, Tuple2<Tuple2<INDArray, INDAr
         int[] pointer = input.getField1().field0;
         int i = pointer[0];
         int j = pointer[1];
-      //  System.out.println("update index : " + index + "   ===>  " + i + "," + j);
-
-        index++;
-
 
         Tuple2<INDArray, INDArray> matrixs = input.getField0();
         if(matrixs.getField0() != null || matrixs.getField1() != null){

@@ -12,67 +12,66 @@ import java.util.List;
 
 public class NMFLoop extends Loop<Double, Double> {
 
-    long maxIterations;
+
     long currentIteration = 1;
-    double minRMSC;
+    long maxIternation;
+
     int epoch;
     List<Double> items;
-    int per_epoch_size ;
+    long perEpochSize ;
+    int alphaEpoch;
 
-    public NMFLoop(int datasetSize, int features, double minRMSC, int epoch) {
-
-        this.minRMSC = minRMSC;
-        this.epoch = epoch;
+    public NMFLoop(int datasetSize, int featureSize,int epoch, int alphaEpoch) {
+        this.perEpochSize = datasetSize*featureSize;
+        this.maxIternation = epoch * (datasetSize * featureSize);
         this.items = new ArrayList<>();
-        this.per_epoch_size = datasetSize*features;
-        this.maxIterations =(datasetSize*features) * (long)epoch;
-        System.out.println("===  " + maxIterations + " , " + this.epoch + " , " + this.per_epoch_size + "   ===  ");
+        this.alphaEpoch = alphaEpoch;
     }
 
     @Override
     public Double prepareConvergenceDataset(Double input, ML4allContext context) {
         double rmsc = 0.0;
-       // System.out.println(this.currentIteration );
 
-        if(input > 0.0){
-            items.add(input);
+        items.add(input);
+        double alpha = (double)context.getByKey("alpha");
+        long r = this.currentIteration % this.perEpochSize;
+        if (this.currentIteration % (this.alphaEpoch*this.perEpochSize) == 0){
+            alpha = alpha/2;
+            context.put("alpha", alpha);
+
+            System.out.println("alpha: " + alpha  + " , " + new Timestamp(new Date().getTime()));
+            double currentRMSC = this.calcualteRMSE();
+
+            System.out.println(this.currentIteration + "(" + this.currentIteration/this.perEpochSize + ") , " + currentRMSC + " , " + currentRMSC );
         }
-
-        int k = (int)((this.currentIteration) % this.per_epoch_size);
-       // System.out.println("prepareConvergenceDataset k : " + k);
-/*
-        if((currentIteration) == 26341991){
-            System.out.println("prepareConvergenceDataset : " + currentIteration);
-        }
-*/
-
-        if(k == 0 ) {
-            System.out.println("items size : " + this.items.size() + " , " + new Timestamp(new Date().getTime()) );
-            System.out.println("epoch size : " + ((this.currentIteration) / this.per_epoch_size) + " , " + this.currentIteration);
-            if(this.items.size() > 0){
-                double s =0.0;
-                for(double item : this.items){
-                    s = s + Math.pow(item, 2);
-                }
-
-                double s2 = s/this.items.size();
-
-                rmsc =  Math.sqrt(s2);
-                this.items.clear();
-
-               }
-            System.out.println("==============>>>>>>>>> " + new Timestamp(new Date().getTime())+ " , " + this.currentIteration + " , " + rmsc);
-        }
-
 
         return rmsc;
 
     }
 
+    private double calcualteRMSE(){
+        double rmsc = 0.0;
+        if(this.items.size() > 0){
+            double s =0.0;
+            for(double item : this.items){
+                s = s + Math.pow(item, 2);
+            }
+
+            double s2 = s/this.items.size();
+
+            rmsc =  Math.sqrt(s2);
+            this.items.clear();
+        }
+        return rmsc;
+
+    }
     @Override
     public boolean terminate(Double input) {
-        int current_epoch = (int)(this.currentIteration / this.per_epoch_size);
-        return ( ++this.currentIteration >= this.maxIterations || current_epoch >= this.epoch);
+/*        if(input < 0.001){
+            return true;
+        }*/
+        int current_epoch = (int)(this.currentIteration / this.perEpochSize);
+        return ( ++this.currentIteration >= this.maxIternation || current_epoch >= this.epoch);
     }
 
 

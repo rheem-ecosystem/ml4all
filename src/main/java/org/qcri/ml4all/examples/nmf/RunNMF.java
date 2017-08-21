@@ -19,22 +19,31 @@ import static org.qcri.ml4all.abstraction.plan.Platforms.*;
  * Execute SGD for nmf.
  */
 public class RunNMF {
-///Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apgNoHeaderInfoBigTable.txt
-    ///Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apg_big_table.csv
-    static String relativePath = "src/main/resources/input/apg_big_table.csv";
-    static String outputPath = "/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/out/";
-    static String path = "/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apg_big_table.csv";
-    static int datasetSize  = 2509;
-    static int features = 10499;
-    static int k = 5;
 
-    static Platforms platform = JAVA;
+    static String samplePath = "src/main/resources/input/dummpy.txt";
+    static String outputPath = "/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/out/";
+    static String path = "/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/aje_youtube_big_table_raw.csv";
+    static String wPath ="/Users/jlucas/Documents/Dev_Python/nmn/w.csv";
+    static String hPath = "/Users/jlucas/Documents/Dev_Python/nmn/h.csv";
+
+
+    static int datasetSize ;
+    static int features;
+    static int k = 5;
+    static double avg;
+
+    static Platforms platform = SPARK_JAVA;
 
     static double lower_bound = 0.0;
-    static double beta = 0.01;
-    static double minRMSC = 0.001;
+    static double alpha = 0.02;
+    static double beta = 0.00;
     static int seed = 1234;
-    static int epoch = 10;
+    static int epoch = 2500;
+    static int alphaEpoch = 150;
+
+    static boolean basedSeedVector = false;
+
+    static INDArray documentMaster;
 
     public static void main (String... args) throws MalformedURLException {
 
@@ -80,7 +89,7 @@ public class RunNMF {
          try {
              setClassVariables(args);
 
-             String file = new File(relativePath).getAbsoluteFile().toURI().toURL().toString();
+             String file = new File(samplePath).getAbsoluteFile().toURI().toURL().toString();
 
              long start_time = System.currentTimeMillis();
 
@@ -88,11 +97,11 @@ public class RunNMF {
              plan.setDatasetsize(datasetSize);
              char delimiter = ',';
              plan.setTransformOp(new NMFTransform(delimiter));
-             plan.setLocalStage(new NMFStageWithRandomValues(k,seed, datasetSize, features));
-             plan.setSampleOp(new NMFSample(1));
-             plan.setComputeOp(new NMFCompute(beta, k));
+             plan.setLocalStage(new NMFStageWithRandomValues(k,seed, datasetSize, features, avg, wPath, hPath, basedSeedVector));
+           //  plan.setSampleOp(new NMFSample(1));
+             plan.setComputeOp(new NMFCompute(beta, datasetSize, features,documentMaster));
              plan.setUpdateLocalOp(new NMFUpdate(lower_bound));
-             plan.setLoopOp(new NMFLoop(datasetSize, features, minRMSC, epoch));
+             plan.setLoopOp(new NMFLoop(datasetSize, features, epoch, alphaEpoch));
 
 
              System.out.println(new Timestamp(new Date().getTime()));
@@ -110,7 +119,7 @@ public class RunNMF {
 
     private static void setClassVariables(String... args){
         if (args.length > 0) {
-            relativePath = args[0];
+            samplePath = args[0];
             String platformIn = args[1];
             switch (platformIn) {
                 case "spark":
@@ -133,9 +142,10 @@ public class RunNMF {
         }
 
         try {
-            INDArray documentMaster = Nd4j.readNumpy("/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/apg_big_table.csv", ",");
+            documentMaster = Nd4j.readNumpy(path, ",");
             datasetSize = documentMaster.rows();
             features = documentMaster.columns();
+            avg = Math.sqrt(documentMaster.meanNumber().doubleValue() / k);
         } catch (IOException e) {
             e.printStackTrace();
         }
