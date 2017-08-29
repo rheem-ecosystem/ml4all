@@ -30,7 +30,7 @@ public class NMFCompute extends Compute<Tuple2<Tuple2, int[]>, double[]> {
     public Tuple2 process(double[] input , ML4allContext context) {
         INDArray updateW = null;
         INDArray updateH = null;
-
+        double aW = 0.0;
 
         int i = this.getRandomIndexPointer(0, this.datasetSize -1);
         int j = this.getRandomIndexPointer(0, this.feasureSize - 1);
@@ -39,18 +39,19 @@ public class NMFCompute extends Compute<Tuple2<Tuple2, int[]>, double[]> {
 
         double aDataPoint = this.trainingDocument.getDouble(i,j);
 
-
-        double alpha = (double)context.getByKey("alpha");
-        INDArray w = (INDArray)context.getByKey("w");
-        INDArray h = (INDArray)context.getByKey("h");
-
-
-        double aW = aDataPoint - (w.getRow(i).mmul(h.getColumn(j)).getDouble(0));
+        if(aDataPoint > 0){
+            double alpha = (double)context.getByKey("alpha");
+            INDArray w = (INDArray)context.getByKey("w");
+            INDArray h = (INDArray)context.getByKey("h");
 
 
-        updateW = ((h.getColumn(j).mul(aW)).sub(w.getRow(i).mul(this.beta))).mul(alpha).transpose();
+            aW = aDataPoint - (w.getRow(i).mmul(h.getColumn(j)).getDouble(0));
 
-        updateH = ((w.getRow(i).mul(aW)).sub(h.getColumn(j).mul(this.beta))).mul(alpha).transpose();
+
+            updateW = ((h.getColumn(j).mul(aW)).sub(w.getRow(i).mul(this.beta))).mul(alpha).transpose();
+
+            updateH = ((w.getRow(i).mul(aW)).sub(h.getColumn(j).mul(this.beta))).mul(alpha).transpose();
+        }
 
         return new Tuple2(new Tuple2(updateW, updateH), new Tuple2(point, aW));
     }

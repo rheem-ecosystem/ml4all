@@ -22,7 +22,8 @@ public class RunNMF {
 
     static String samplePath = "src/main/resources/input/dummy.txt";
     static String outputPath = "/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/out/";
-    static String path = "/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/aje_youtube_big_table_raw.csv";
+    static String sourcePath = "/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/aje_youtube_big_table_raw.csv";
+    //static String sourcePath ="/Users/jlucas/Documents/Rheem/ml4all/src/main/resources/input/sample.txt";
     static String wPath ="/Users/jlucas/Documents/Dev_Python/nmn/w.csv";
     static String hPath = "/Users/jlucas/Documents/Dev_Python/nmn/h.csv";
 
@@ -143,7 +144,7 @@ public class RunNMF {
         }
 
         try {
-            documentMaster = Nd4j.readNumpy(path, ",");
+            documentMaster = Nd4j.readNumpy(sourcePath, ",");
             datasetSize = documentMaster.rows();
             features = documentMaster.columns();
             avg = Math.sqrt(documentMaster.meanNumber().doubleValue() / k);
