@@ -10,13 +10,13 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <rheem.version>0.2.2-SNAPSHOT</rheem.version>
+        <rheem.version>0.3.0</rheem.version>
     </properties>
 
     <dependencies>
         <dependency> <!-- Rheem dependency -->
             <groupId>org.qcri.rheem</groupId>
-            <artifactId>rheem-api</artifactId>
+            <artifactId>rheem-api_2.11</artifactId>
             <version>${rheem.version}</version>
         </dependency>
         <dependency> <!-- Rheem dependency -->
@@ -36,7 +36,7 @@
         </dependency>
         <dependency> <!-- Rheem dependency -->
             <groupId>org.qcri.rheem</groupId>
-            <artifactId>rheem-spark</artifactId>
+            <artifactId>rheem-spark_2.11</artifactId>
             <version>${rheem.version}</version>
         </dependency>
         <dependency>
