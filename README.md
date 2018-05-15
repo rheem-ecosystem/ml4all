@@ -11,6 +11,6 @@ Currently running on:
 - Rheem 0.3.0
 - Spark 1.6.x
 
-Some examples can be found in: org.qcri.ml4all.examples:
+Some examples can be found in org.qcri.ml4all.examples:
 - kmeans: RunKmeans
 - sgd: RunSGD
